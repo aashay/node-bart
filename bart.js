@@ -1,8 +1,10 @@
 var xml2js = require('xml2js');
 var parser = new xml2js.Parser();
-
-var rest = require('restler');
+var request = require('request');
 var events = require('events');
+
+var codes = require('./lib/codes');
+
 
 //TODO: Redis is only a stopgap for test data
 var redis = require('redis');
@@ -11,16 +13,25 @@ var rc = redis.createClient();
 var ETDAPIURL_PREFIX = "http://api.bart.gov/api/etd.aspx?cmd=etd&orig=";
 function Bart(){
 
-    //TODO: Options n stuff
+    /**
+     * Convenience function to smash two objects together.
+     * @param obj1
+     * @param obj2
+     * @returns obj3, a merged object
+     */
+    function merge_objects(obj1,obj2){
+        var obj3 = {};
+        for (var attrname in obj1) { obj3[attrname] = obj1[attrname]; }
+        for (var attrname in obj2) { obj3[attrname] = obj2[attrname]; }
+        return obj3;
+    }
 
     var apiKey = this.apiKey = "MW9S-E7SL-26DU-VV8V";
     var emitter = this.emitter = new events.EventEmitter();
 
-
     function Poller(station){
         this.interval = 60000;
         this.station = station.toLowerCase();
-        this.timeCache = {};
     }
 
     //TODO: Blow this away eventually
@@ -29,10 +40,10 @@ function Bart(){
         //Simulate poll and change
         var tick = 0;
         var pollInterval = setInterval(function(){
-            
+
         },self.interval);
-        
-        rc.get("bart:dbrk:leaving", function(err,data){
+
+        rc.get("bart:dbrk:1347519094049", function(err,data){
             self.handleData(err,JSON.parse(data));
         });
     }
@@ -60,13 +71,22 @@ function Bart(){
         var self = this;
         if(err) return emitter.emit('error', err);
         if(!data) return emitter.emit('error', "Could not get BART data");
-        
-        //In case of invalid API keys and the sort
-        if(data.root.message && data.root.message[0].error){
-            return emitter.emit('error',data.root.message[0].error[0]);
-        }
 
-        etd = data.root.station[0].etd;
+        //In case of invalid API keys etc
+        if(data.root.message && data.root.message[0].error){
+            clearInterval(self.pollInterval);
+            emitter.emit('error',data.root.message[0].error[0]);
+            return;
+        }
+        //console.log(util.inspect(data, false, null))
+        var etd = data.root.station[0].etd;
+        var rootData = {
+            "uri" : data.root.uri[0],
+            "date" : data.root.date[0],
+            "time" : data.root.time[0],
+            "name" : data.root.station[0].name[0],
+            "message" : data.root.message[0]
+         }
 
         //BART has either stopped running for the night or they just don't have ETD for some reason.
         if(!etd){
@@ -74,18 +94,18 @@ function Bart(){
             return emitter.emit('error', "No current ETD info available for " + self.station);
         }
 
+        //Synchronously split up northbound and southbound data
+        var northBound = [];
+        var southBound = [];
         //var station = data.root.station[0].abbr[0].toLowerCase();
-        etd.forEach(function(e){
-
-            var northBound = [];
-            var southBound = [];
+        etd.forEach(function(e){            
             e.estimate.forEach(function(est){
-                
+
                 //Deal with the xml2js madness with a whole lotta [0]'s
                 var destination = e.destination[0];
                 var abbreviation = e.abbreviation[0];
-                
-                //The BART API is kinda silly in that it has the word "Leaving" when minutes hits 0. 
+
+                //The BART API is kinda silly in that it has the word "Leaving" when minutes hits 0.
                 //"Leaving" isn't a number, so we make it 0.
                 var minutes = (est.minutes[0]=="Leaving") ? 0 : parseInt(est.minutes[0]);
                 var platform = est.platform[0];
@@ -95,7 +115,7 @@ function Bart(){
                 var hexcolor = est.hexcolor[0];
                 var bikeflag = !!est.bikeflag[0]; //A real bool!
 
-                var info = {
+                var info = merge_objects({
                     "station":self.station,
                     "destination":destination,
                     "abbreviation":abbreviation,
@@ -106,40 +126,44 @@ function Bart(){
                     "color":color,
                     "hexcolor":hexcolor,
                     "bikeflag":bikeflag
-                }
+                }, rootData);
+                
                 if(direction.toLowerCase() == "north"){
                     northBound.push(info);
                 }else{
                     southBound.push(info);
                 }
-            });
-
-            if(northBound.length > 0){
-                emitter.emit(self.station+" north", northBound, e); //Northbound event
-            }
-            if(southBound.length > 0){
-                emitter.emit(self.station+" south", southBound, e); //Southbound events
-            }
-            emitter.emit(self.station, northBound.concat(southBound), e); //Generic station event
-            
-            northBound = [];
-            southBound = [];
+            }); 
         });
+        if(northBound.length > 0){
+            emitter.emit(self.station+" north", northBound); //Northbound event
+        }
+        if(southBound.length > 0){
+            emitter.emit(self.station+" south", southBound); //Southbound events
+        }
+        
+        emitter.emit(self.station, northBound.concat(southBound)); //Generic station event
+
+        northBound = [];
+        southBound = [];
     }
 
 
     var pollers = {}
-    var self = this;
+    var bart = this;
     this.emitter.on('newListener', function(eventName, listener){
        if(eventName != "error"){
            station = eventName.split(' ')[0].toLowerCase();
 
-           //TODO make sure station is a legit station code
+           if(codes.indexOf(station) == -1){
+               return bart.emitter.emit('error', station + " is not a valid BART station code.");
+           }
 
            //Create a "poller" for this particular station, but if we don't have one already
            if(!pollers[station]){
                var poller = pollers[station] = new Poller(station);
-               var url = ETDAPIURL_PREFIX+station.toUpperCase()+"&key="+self.apiKey;
+               poller.interval = (bart.interval || poller.interval);
+               var url = ETDAPIURL_PREFIX+station.toUpperCase()+"&key="+bart.apiKey;
                poller.poll(url);
            }
        }
@@ -160,6 +184,5 @@ Bart.prototype.setInterval = function(seconds){
 }
 
 
-var bart = new Bart();
-module.exports = bart;
+module.exports = new Bart();
 
