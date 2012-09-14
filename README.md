@@ -1,23 +1,27 @@
 #BART (Bay Area Rapid Transit) ETD (Estimated Time to Departure)
+Disclaimer: [insert disclaimer here about not being affiliated with BART ]
 
 ## TODO:  EVERYTHING
 
 Pass in either a station code or a station code and a direction as an event!
 
 
-Usage examples:
-var bart = require('bart');
+## Usage examples:
 
-bart.on('dbrk', function(estimates){
-   console.log(estimates); 
-});
+    var bart = require('bart');
 
-You can also specify a direction
+    bart.on('dbrk', function(estimates){
+       console.log(estimates); 
+    });
 
-bart.on('dbrk south', function(southbound){
-   console.log(southbound); 
-});
 
+You can also filter data by specifying a direction: 
+
+    bart.on('dbrk south', function(southbound){
+       console.log(southbound); 
+    });
+
+Note that if you specify a station-specific handler without a direction, you'll get events for both directions.
 
 
 
