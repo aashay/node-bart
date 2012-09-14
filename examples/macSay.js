@@ -4,7 +4,7 @@
 */
 
 var exec = require('child_process').exec;
-var bart = require('../bart');
+var bart = require('../lib/bart');
 
 var speechQueue = [];
 
