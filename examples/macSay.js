@@ -1,5 +1,6 @@
 /*
 * A fun little BART talker, kinda like the ones on the platform.
+* Only works on a Mac!
 */
 
 var exec = require('child_process').exec;
