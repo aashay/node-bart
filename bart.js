@@ -40,21 +40,19 @@ function Bart(){
     Poller.prototype.poll = function(url){
         var self = this;
         self._getData(url);
-        var pollInterval = setInterval(function(){
+        this.pollInterval = setInterval(function(){
             self._getData(url);
         }, self.interval);
     }
 
     Poller.prototype._getData = function(url){
-        //TODO: Replace this with request
         var self = this;
-        rest.get(url,{
-            "parser": rest.parsers.xml,
-        }).on('error', function(e) {
-            emitter.emit('error',e);
-        }).on('success', function(data){
-            //rc.set("bart:"+self.station+":"+Date.now(), JSON.stringify(data));
-            self.handleData(null,data);
+        request.get(url, function (err, res, data) {
+            if(err) return emitter.emitter('error', err);
+            parser.parseString(data, function (err, result) {
+                //rc.set("bart:"+self.station+":"+Date.now(), JSON.stringify(data));
+                self.handleData(null,result);
+            });
         });
     }
 
