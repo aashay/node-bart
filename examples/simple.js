@@ -1,18 +1,12 @@
 /*
-* A simple example
+* A simple example.
 */
 
-var bart = require('../bart');
+var bart = require('../lib/bart');
 
-
-
-function foo(){
-    bart.on('dbrk', function(estimates){
-        console.log(estimates);
-    });
-}
-
-foo();
+bart.on('dbrk', function(estimates){
+    console.log(estimates);
+});
 
 bart.on('error', function(err){
     console.log(err);
