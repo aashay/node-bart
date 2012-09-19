@@ -4,7 +4,7 @@
 */
 
 var exec = require('child_process').exec;
-var bart = require('../lib/bart');
+var bart = require('../lib/bart').createClient();
 
 var speechQueue = [];
 
@@ -48,11 +48,9 @@ var sayInterval = setInterval(function(){
 }, 10000); //Polling the queue every 10 seconds, approx how long it takes for one of the voices to say a message.
 
 bart.on('dbrk south', function(estimates){
-    speechQueue.push({"estimates":estimates, "voice":"Victoria"});
-});
-
-bart.on('dbrk north', function(estimates){
-    speechQueue.push({"estimates":estimates, "voice":"Bruce"});
+    //  console.log(estimates)
+    foo = [estimates[3], estimates[4], estimates[5]]
+    speechQueue.push({"estimates":foo, "voice":"Victoria"});
 });
 
 bart.on('error', function(err){
