@@ -7,12 +7,17 @@ var fakedata = JSON.parse('{"root":{"uri":["http://api.bart.gov/api/etd.aspx?cmd
 describe('Bart', function(){
     var bart = require('../lib/bart').createClient();
     
+    beforeEach(function(){
+        bart.emitter.removeAllListeners('dbrk');
+    });
+    
     //Create a custom poller so we can return our own data
     function TestPoller(station){
         this.station = station;
         this.interval = 1000;
     }
-    TestPoller.prototype = bart.pollerproto;
+    TestPoller.prototype = new bart.pollerObj("dbrk");
+    TestPoller.prototype.constructor = TestPoller;
 
     TestPoller.prototype.getData = function(url, cb){
         return cb.call(this, null, fakedata);
@@ -49,19 +54,18 @@ describe('Bart', function(){
     
     it('should throw an error when using an invalid API key', function(done){
         var origKey = bart.apiKey;
-        console.log(origKey)
+        //console.log(origKey)
         bart.apiKey = "foo"
         bart.on('error', function(err){                
-            assert.ok(err.toString().indexOf("keyyy") > -1, "API Key error message was different. Got: " + err);
+            assert.ok(err.toString().indexOf("Invalid key") > -1, "API Key error message was different. Got: " + err);
             bart.emitter.removeAllListeners('error');
             bart.apiKey = origKey;
             done();
         });
-
+        
         bart.on('mont', function(data){
             assert.ok(!data, "Found data");                
             done("Got back data with invalid bart api key");
         });
-        
     });
 });

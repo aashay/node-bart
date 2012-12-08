@@ -49,8 +49,7 @@ var sayInterval = setInterval(function(){
 
 bart.on('dbrk south', function(estimates){
     //  console.log(estimates)
-    foo = [estimates[3], estimates[4], estimates[5]]
-    speechQueue.push({"estimates":foo, "voice":"Victoria"});
+    speechQueue.push({"estimates":estimates, "voice":"Victoria"});
 });
 
 bart.on('error', function(err){
