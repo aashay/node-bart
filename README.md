@@ -1,8 +1,6 @@
 #BART (Bay Area Rapid Transit) ETD (Estimated Time to Departure)
 Disclaimer: [insert disclaimer here about not being affiliated with BART ]
 
-## TODO:  EVERYTHING
-
 Pass in either a station code or a station code and a direction as an event!
 
 
@@ -24,6 +22,8 @@ You can also filter data by specifying a direction:
 Note that if you specify a station-specific handler without a direction, you'll get events for both directions.
 
 ## API
+
+TODO:  For now, use the above usage examples because frankly, that's all this does.  But, if you need slightly different options:
 
 ### bart.createClient(options)
 Create a bart client with options.  If no options are specified, defaults will be used.
@@ -48,3 +48,14 @@ Tests:
 TODO:
 
 Document the objects that are returned
+
+
+## License
+
+MIT.  
+
+Also, I take no responsibility for any trains you may miss as a result of this module. :)
+
+## Contributing
+
+Pull requests are welcome.  My code style is no style (kinda like [Jeet Kune Do](http://en.wikipedia.org/wiki/Jeet_Kune_Do), ya know?)
