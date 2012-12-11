@@ -1,0 +1,40 @@
+{
+  "name": "bart",
+  "version": "0.0.1",
+  "description": "BART (Bay Area Rapid Transit) ETD Event Emitters",
+  "main": "lib/bart.js",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "dependencies": {
+    "request": "~2.11.1",
+    "sax": "~0.4.2",
+    "xml2js": "~0.2.0"
+  },
+  "devDependencies": {
+      "redis": "~0.8.1",
+      "mocha": "~1.4.2"      
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/aashay/node-bart.git"
+  },
+  "keywords": [
+    "bart",
+    "bay",
+    "area",
+    "rapid",
+    "transit",
+    "train",
+    "api",
+    "etd",
+    "realtime",
+    "events"
+  ],
+  "author": "Aashay Desai",
+  "license": "MIT"
+}
