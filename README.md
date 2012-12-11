@@ -3,7 +3,6 @@ Disclaimer: [insert disclaimer here about not being affiliated with BART ]
 
 Pass in either a station code or a station code and a direction as an event!
 
-
 ## Usage examples:
 
     var bart = require('bart').createClient();
@@ -13,6 +12,42 @@ Pass in either a station code or a station code and a direction as an event!
     });
 
 
+The above example would output something like this:
+
+    [ { station: 'dbrk',
+        destination: 'Richmond',
+        abbreviation: 'RICH',
+        minutes: 5,
+        platform: '1',
+        direction: 'North',
+        length: '9',
+        color: 'RED',
+        hexcolor: '#ff0000',
+        bikeflag: true,
+        uri: 'http://api.bart.gov/api/etd.aspx?cmd=etd&orig=DBRK',
+        date: '12/10/2012',
+        time: '08:52:38 PM PST',
+        name: 'Downtown Berkeley',
+        message: {} },
+      { station: 'dbrk',
+        destination: 'Richmond',
+        abbreviation: 'RICH',
+        minutes: 11,
+        platform: '1',
+        direction: 'North',
+        length: '6',
+        color: 'ORANGE',
+        hexcolor: '#ff9933',
+        bikeflag: true,
+        uri: 'http://api.bart.gov/api/etd.aspx?cmd=etd&orig=DBRK',
+        date: '12/10/2012',
+        time: '08:52:38 PM PST',
+        name: 'Downtown Berkeley',
+        message: {} },
+        ...
+    ]
+
+
 You can also filter data by specifying a direction: 
 
     bart.on('dbrk south', function(southbound){
@@ -20,6 +55,7 @@ You can also filter data by specifying a direction:
     });
 
 Note that if you specify a station-specific handler without a direction, you'll get events for both directions.
+
 
 ## API
 
