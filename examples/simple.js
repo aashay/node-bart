@@ -2,7 +2,7 @@
 * A simple example.
 */
 
-var bart = require('../lib/bart');
+var bart = require('../lib/bart').createClient();
 
 bart.on('dbrk', function(estimates){
     console.log(estimates);
