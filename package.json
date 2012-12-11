@@ -1,6 +1,6 @@
 {
   "name": "bart",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "BART (Bay Area Rapid Transit) ETD Event Emitters",
   "main": "lib/bart.js",
   "directories": {
@@ -17,7 +17,7 @@
       "mocha": "~1.4.2"      
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha test/"
   },
   "repository": {
     "type": "git",
