@@ -76,14 +76,15 @@ Example:
 
 
 
-Tests:
--Try event with three names
--Test that directionless station events return both station events
--Test invalid api key
+Tests:  
+
+* Try event with three names
+* Test that directionless station events return both station events
+* Test invalid api key
 
 TODO:
 
-Document the objects that are returned
+Document the objects that are returned (especially the test cruft :\) 
 
 
 ## License
@@ -94,4 +95,4 @@ Also, I take no responsibility for any trains you may miss as a result of this m
 
 ## Contributing
 
-Pull requests are welcome.
+Pull requests are very welcome!
