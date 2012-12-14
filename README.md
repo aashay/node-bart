@@ -94,4 +94,4 @@ Also, I take no responsibility for any trains you may miss as a result of this m
 
 ## Contributing
 
-Pull requests are welcome.  My code style is no style (kinda like [Jeet Kune Do](http://en.wikipedia.org/wiki/Jeet_Kune_Do), ya know?)
+Pull requests are welcome.
